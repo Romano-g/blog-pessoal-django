@@ -1,9 +1,17 @@
 from django.contrib import admin
-from site_configs.models import MenuLink
+from django.http.request import HttpRequest
+from site_configs.models import MenuLink, SiteSetup
 
 
-@admin.register(MenuLink)
-class MenuLinkAdmin(admin.ModelAdmin):
-    list_display = 'id', 'text', 'url_or_path',
-    list_display_links = 'id', 'text',
-    search_fields = 'id', 'text', 'url_or_path',
+class MenuLinkInine(admin.TabularInline):
+    model = MenuLink
+    extra = 1
+
+
+@admin.register(SiteSetup)
+class SiteSetupAdmin(admin.ModelAdmin):
+    list_display = 'title', 'description',
+    inlines = MenuLinkInine,
+
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return not SiteSetup.objects.exists()
